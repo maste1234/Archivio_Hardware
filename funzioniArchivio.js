@@ -1,5 +1,6 @@
-/** @module funzioniArchivio.js - Modulo che contieneen le funzioni del progetto */
+/** @module funzioniArchivio.js - Modulo contenente le funzioni del progetto */
 const prompt = require("prompt-sync")();
+const fs = require("fs");
 
 const STATI_VALIDI = ["attivo", "guasto", "in manutenzione"];
 
@@ -43,4 +44,30 @@ const visualizzaInventario = function(inventario){
     inventario.forEach(x => console.log(x));
 }
 
-module.exports = { inserimentoDispositivo, controlloDuplicato, cambiaStato, visualizzaInventario };
+
+
+const aggiuntaNota = function(inventario, seriale){
+    let index = inventario.findIndex(x => x.Seriale === seriale);
+    if (index === -1) return false;
+    let data = prompt("Data intervento (gg/mm/aaaa): ").trim();
+    let descrizione = prompt("Descrizione intervento: ").trim();
+    let nota = { "Data": data, "Descrizione": descrizione };
+    inventario[index].Manutenzioni.push(nota);
+    return true;
+}
+
+const ricercaPerStato = function(inventario, stato){
+    inventario.forEach(x => {
+        if (x.Stato === stato) {
+            console.log(x);
+        }
+    });
+}
+
+const esportaJSON = function(inventario){
+    let nomeFile = "inventario_export.json";
+    fs.writeFileSync(nomeFile, JSON.stringify(inventario, null, 2));
+    console.log("File esportato: " + nomeFile);
+}
+
+module.exports = { inserimentoDispositivo, controlloDuplicato, cambiaStato, visualizzaInventario, aggiuntaNota, ricercaPerStato, esportaJSON };
